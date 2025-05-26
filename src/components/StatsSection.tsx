@@ -5,8 +5,8 @@ const StatsSection = () => {
       <div className="max-w-6xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           <div>
-            <div className="text-4xl font-bold text-red-600 mb-2">270M+</div>
-            <div className="text-gray-600">Netflix subscribers worldwide</div>
+            <div className="text-4xl font-bold text-red-600 mb-2">500M+</div>
+            <div className="text-gray-600">Global streaming subscribers</div>
           </div>
           <div>
             <div className="text-4xl font-bold text-orange-500 mb-2">10M+</div>
