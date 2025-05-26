@@ -15,16 +15,17 @@ interface Movie {
   watchedDate: string;
   confidence: 'High' | 'Medium' | 'Low';
   selected: boolean;
+  tmdbId?: number;
 }
 
 const Preview = () => {
   const navigate = useNavigate();
   const [movies, setMovies] = useState<Movie[]>([
-    { id: '1', title: 'The Social Network', year: 2010, watchedDate: '2024-01-15', confidence: 'High', selected: true },
-    { id: '2', title: 'Inception', year: 2010, watchedDate: '2024-01-20', confidence: 'High', selected: true },
-    { id: '3', title: 'The Dark Knight', year: 2008, watchedDate: '2024-02-01', confidence: 'Medium', selected: true },
-    { id: '4', title: 'Interstellar', year: 2014, watchedDate: '2024-02-10', confidence: 'High', selected: true },
-    { id: '5', title: 'Parasite', year: 2019, watchedDate: '2024-02-15', confidence: 'Low', selected: false },
+    { id: '1', title: 'The Social Network', year: 2010, watchedDate: '2024-01-15', confidence: 'High', selected: true, tmdbId: 37799 },
+    { id: '2', title: 'Inception', year: 2010, watchedDate: '2024-01-20', confidence: 'High', selected: true, tmdbId: 27205 },
+    { id: '3', title: 'The Dark Knight', year: 2008, watchedDate: '2024-02-01', confidence: 'Medium', selected: true, tmdbId: 155 },
+    { id: '4', title: 'Interstellar', year: 2014, watchedDate: '2024-02-10', confidence: 'High', selected: true, tmdbId: 157336 },
+    { id: '5', title: 'Parasite', year: 2019, watchedDate: '2024-02-15', confidence: 'Low', selected: false, tmdbId: 496243 },
   ]);
 
   const selectedCount = movies.filter(movie => movie.selected).length;
@@ -47,6 +48,11 @@ const Preview = () => {
         {confidence}
       </Badge>
     );
+  };
+
+  const getMovieImage = (tmdbId?: number) => {
+    if (!tmdbId) return '/placeholder.svg';
+    return `https://image.tmdb.org/t/p/w92/${tmdbId}`;
   };
 
   return (
@@ -72,19 +78,19 @@ const Preview = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105">
+          <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105 animate-fade-in">
             <CardContent className="p-6 text-center">
               <div className="text-3xl font-bold text-blue-600 mb-2">{movies.length}</div>
               <div className="text-gray-600">Total Movies Found</div>
             </CardContent>
           </Card>
-          <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105">
+          <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105 animate-fade-in">
             <CardContent className="p-6 text-center">
               <div className="text-3xl font-bold text-green-600 mb-2">{selectedCount}</div>
               <div className="text-gray-600">Selected for Import</div>
             </CardContent>
           </Card>
-          <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105">
+          <Card className="hover:shadow-lg transition-all duration-300 hover:scale-105 animate-fade-in">
             <CardContent className="p-6 text-center">
               <div className="text-3xl font-bold text-orange-600 mb-2">{lowConfidenceCount}</div>
               <div className="text-gray-600">Need Review</div>
@@ -126,6 +132,7 @@ const Preview = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-12">Include</TableHead>
+                  <TableHead className="w-20">Poster</TableHead>
                   <TableHead>🎬 Title</TableHead>
                   <TableHead>📅 Watched Date</TableHead>
                   <TableHead>🧠 Match Confidence</TableHead>
@@ -136,7 +143,7 @@ const Preview = () => {
                 {movies.map((movie) => (
                   <TableRow 
                     key={movie.id} 
-                    className={`transition-all duration-300 hover:bg-gray-50 ${
+                    className={`transition-all duration-300 hover:bg-gray-50 hover:scale-[1.01] ${
                       movie.selected ? 'bg-green-50/50' : 'bg-gray-50/50'
                     }`}
                   >
@@ -145,6 +152,16 @@ const Preview = () => {
                         checked={movie.selected}
                         onCheckedChange={() => toggleMovie(movie.id)}
                         className="hover:scale-110 transition-transform duration-200"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <img 
+                        src={movie.tmdbId ? `https://image.tmdb.org/t/p/w92/uS1AIL7I1Ycgs8PTfqUeN6jYNsQ.jpg` : '/placeholder.svg'}
+                        alt={movie.title}
+                        className="w-12 h-18 object-cover rounded-md hover:scale-110 transition-transform duration-300"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/placeholder.svg';
+                        }}
                       />
                     </TableCell>
                     <TableCell className="font-medium">
