@@ -1,0 +1,6 @@
+<svg width="240" height="360" viewBox="0 0 240 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="240" height="360" fill="#F3F4F6"/>
+  <path d="M120 140C133.255 140 144 129.255 144 116C144 102.745 133.255 92 120 92C106.745 92 96 102.745 96 116C96 129.255 106.745 140 120 140Z" fill="#D1D5DB"/>
+  <path d="M168 220C168 242.091 146.091 260 120 260C93.9086 260 72 242.091 72 220C72 197.909 93.9086 180 120 180C146.091 180 168 197.909 168 220Z" fill="#D1D5DB"/>
+  <text x="120" y="300" text-anchor="middle" font-family="system-ui" font-size="14" fill="#6B7280">No Poster Available</text>
+</svg> 

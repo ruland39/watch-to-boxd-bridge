@@ -1,42 +1,108 @@
-
 import { useState, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Upload as UploadIcon, Check, X, ArrowLeft } from "lucide-react";
+import { 
+  Upload as UploadIcon, 
+  Check, 
+  X, 
+  ArrowLeft, 
+  ExternalLink,
+  AlertTriangle 
+} from "lucide-react";
 import { useNavigate } from 'react-router-dom';
+import StepProgress from '@/components/StepProgress';
+import { convertNetflixToLetterboxd } from '@/lib/csvConverter';
+import { validateCSVFile } from '@/lib/csvValidator';
+import { useWatchHistory } from '@/contexts/WatchHistoryContext';
+import { useToast } from "@/components/ui/use-toast";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const Upload = () => {
   const [uploadState, setUploadState] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
   const [progress, setProgress] = useState(0);
   const [fileName, setFileName] = useState('');
   const [dragActive, setDragActive] = useState(false);
+  const [errorDetails, setErrorDetails] = useState<{ error: string; details: string } | null>(null);
   const navigate = useNavigate();
+  const { setEntries, setOriginalFile } = useWatchHistory();
+  const { toast } = useToast();
 
-  const handleFile = useCallback((file: File) => {
-    if (!file.name.endsWith('.csv')) {
-      setUploadState('error');
-      return;
+  const netflixSteps = [
+    {
+      title: "Go to Netflix Viewing Activity",
+      description: "Click the button below to open Netflix viewing activity page in a new tab",
+      content: (
+        <a 
+          href="https://www.netflix.com/viewingactivity" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="inline-flex"
+        >
+          <Button className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 text-base hover:scale-105 transition-all duration-300">
+            Open Netflix Viewing Activity
+            <ExternalLink className="ml-2 h-4 w-4" />
+          </Button>
+        </a>
+      )
+    },
+    {
+      title: "Download History",
+      description: "At the bottom of your viewing activity, click 'Download all' to get your ViewingActivity.csv file"
+    },
+    {
+      title: "Upload File",
+      description: "Once downloaded, drag and drop the ViewingActivity.csv file here or use the upload button"
     }
+  ];
 
+  const handleFile = useCallback(async (file: File) => {
     setFileName(file.name);
-    setUploadState('uploading');
-    setProgress(0);
+    setErrorDetails(null);
 
-    // Simulate file processing
-    const interval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setUploadState('success');
-          // Navigate to preview after a short delay
-          setTimeout(() => navigate('/preview'), 1500);
-          return 100;
-        }
-        return prev + 10;
+    try {
+      // Validate the file first
+      const validationResult = await validateCSVFile(file);
+      
+      if (!validationResult.isValid) {
+        setUploadState('error');
+        setErrorDetails({
+          error: validationResult.error || 'Validation Error',
+          details: validationResult.details || 'The file could not be validated'
+        });
+        return;
+      }
+
+      setUploadState('uploading');
+      setProgress(0);
+
+      // Start progress animation
+      const progressInterval = setInterval(() => {
+        setProgress(prev => Math.min(prev + 10, 90));
+      }, 200);
+
+      // Process the file
+      const processedEntries = await convertNetflixToLetterboxd(file);
+      
+      // Store the results
+      setOriginalFile(file);
+      setEntries(processedEntries);
+
+      // Complete the progress
+      clearInterval(progressInterval);
+      setProgress(100);
+      setUploadState('success');
+
+      // Navigate to preview after a short delay
+      setTimeout(() => navigate('/preview'), 1500);
+    } catch (error) {
+      setUploadState('error');
+      setErrorDetails({
+        error: 'Processing Error',
+        details: error instanceof Error ? error.message : 'Failed to process the file'
       });
-    }, 200);
-  }, [navigate]);
+    }
+  }, [navigate, setEntries, setOriginalFile]);
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -65,6 +131,10 @@ const Upload = () => {
     }
   }, [handleFile]);
 
+  const handleButtonClick = () => {
+    document.getElementById('file-upload')?.click();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 px-4 py-8">
       <div className="max-w-4xl mx-auto">
@@ -85,6 +155,16 @@ const Upload = () => {
             Upload your Netflix viewing history CSV file and we'll start processing your data.
           </p>
         </div>
+
+        {/* Instructions Card */}
+        <Card className="max-w-2xl mx-auto mb-8 shadow-lg border-2 hover:shadow-xl transition-all duration-300">
+          <CardContent className="p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">How to get your Netflix data:</h2>
+            <div className="relative">
+              <StepProgress steps={netflixSteps} currentStep={uploadState === 'idle' ? 2 : 3} />
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Upload Card */}
         <Card className="max-w-2xl mx-auto shadow-lg border-2 hover:shadow-xl transition-all duration-300">
@@ -115,11 +195,12 @@ const Upload = () => {
                   className="hidden"
                   id="file-upload"
                 />
-                <label htmlFor="file-upload">
-                  <Button className="cursor-pointer bg-red-600 hover:bg-red-700 text-white px-8 py-3 text-lg hover:scale-105 transition-all duration-300">
-                    Choose File
-                  </Button>
-                </label>
+                <Button 
+                  onClick={handleButtonClick}
+                  className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 text-lg hover:scale-105 transition-all duration-300"
+                >
+                  Choose File
+                </Button>
               </div>
             )}
 
@@ -132,7 +213,7 @@ const Upload = () => {
                   Processing your data...
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  Parsing your movies and matching titles
+                  Converting Netflix format to Letterboxd format
                 </p>
                 <Progress value={progress} className="w-full mb-4" />
                 <p className="text-sm text-gray-500">{fileName}</p>
@@ -145,10 +226,10 @@ const Upload = () => {
                   <Check className="h-8 w-8 text-green-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-green-900 mb-2">
-                  ✅ File uploaded successfully!
+                  ✅ File processed successfully!
                 </h3>
                 <p className="text-gray-600 mb-4">
-                  Redirecting you to review your movies...
+                  Taking you to preview your movies...
                 </p>
                 <div className="animate-pulse">
                   <div className="h-2 bg-green-200 rounded-full overflow-hidden">
@@ -163,14 +244,30 @@ const Upload = () => {
                 <div className="h-16 w-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
                   <X className="h-8 w-8 text-red-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-red-900 mb-2">
-                  ❌ We couldn't read that file
-                </h3>
-                <p className="text-gray-600 mb-6">
-                  Make sure it's your Netflix watch history CSV file
-                </p>
+                
+                <Alert variant="destructive" className="mb-6">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle>{errorDetails?.error || 'Upload Error'}</AlertTitle>
+                  <AlertDescription className="mt-2">
+                    {errorDetails?.details || 'Something went wrong while processing your file.'}
+                  </AlertDescription>
+                </Alert>
+
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+                  <h4 className="font-semibold text-amber-900 mb-2">How to fix this:</h4>
+                  <ol className="text-left text-amber-800 space-y-2">
+                    <li>1. Go to <a href="https://www.netflix.com/viewingactivity" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Netflix Viewing Activity</a></li>
+                    <li>2. Scroll to the bottom of the page</li>
+                    <li>3. Click "Download all" to get your viewing history</li>
+                    <li>4. Upload the downloaded "ViewingActivity.csv" file</li>
+                  </ol>
+                </div>
+
                 <Button 
-                  onClick={() => setUploadState('idle')}
+                  onClick={() => {
+                    setUploadState('idle');
+                    setErrorDetails(null);
+                  }}
                   className="bg-red-600 hover:bg-red-700 hover:scale-105 transition-all duration-300"
                 >
                   Try Again
@@ -179,17 +276,6 @@ const Upload = () => {
             )}
           </CardContent>
         </Card>
-
-        {/* Help Section */}
-        <div className="max-w-2xl mx-auto mt-8 p-6 bg-blue-50 rounded-xl border border-blue-200">
-          <h4 className="font-semibold text-blue-900 mb-2">📋 How to get your Netflix data:</h4>
-          <ol className="text-sm text-blue-800 space-y-1">
-            <li>1. Go to your Netflix Account Settings</li>
-            <li>2. Click "Download your personal information"</li>
-            <li>3. Request your data and wait for the email</li>
-            <li>4. Download and find the "ViewingActivity.csv" file</li>
-          </ol>
-        </div>
       </div>
     </div>
   );

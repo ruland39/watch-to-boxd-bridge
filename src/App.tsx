@@ -1,9 +1,9 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { WatchHistoryProvider } from "@/contexts/WatchHistoryContext";
 import Index from "./pages/Index";
 import Upload from "./pages/Upload";
 import Preview from "./pages/Preview";
@@ -15,6 +15,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <WatchHistoryProvider>
       <Toaster />
       <Sonner />
       <BrowserRouter>
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
+      </WatchHistoryProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
