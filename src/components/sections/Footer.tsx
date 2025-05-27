@@ -45,10 +45,21 @@ const Footer = () => {
           <p className="text-center text-sm text-gray-600">
             © {new Date().getFullYear()} WatchToBoxd. All rights reserved.
           </p>
+          <p className="text-center text-sm text-gray-600 mt-2">
+            Vibecoded by{' '}
+            <a 
+              href="https://www.linkedin.com/in/rulandfurqan/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-indigo-600 hover:text-indigo-800"
+            >
+              Ruland
+            </a>
+          </p>
         </div>
       </div>
     </footer>
   );
 };
 
-export default Footer; 
+export default Footer;
