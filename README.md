@@ -1,73 +1,34 @@
-# Welcome to your Lovable project
+# 🎬 WatchToBoxd
 
-## Project info
+Convert your **Netflix watch history** into a **Letterboxd-compatible CSV** in seconds.
 
-**URL**: https://lovable.dev/projects/3c09d93f-eca1-4052-aa68-27a2b6d1d5ff
+WatchToBoxd is a lightweight, privacy-friendly web tool that helps movie lovers seamlessly migrate their Netflix watch history to Letterboxd — no account, no fuss.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## ✨ Features
 
-**Use Lovable**
+- ✅ Convert Netflix CSV files to Letterboxd import format
+- ✅ Automatic movie matching using title and year
+- ✅ Simple drag-and-drop interface
+- ✅ Letterboxd-ready CSV download
+- ✅ No data stored — everything processed in-browser
+- 🛠 Support for more platforms coming soon (Disney+, Prime Video, etc.)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/3c09d93f-eca1-4052-aa68-27a2b6d1d5ff) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+## 📥 How It Works
 
-**Use your preferred IDE**
+1. **Export** your Netflix viewing history as a CSV  
+   ➤ [Learn how to download it here](#)
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+2. **Upload** your file to WatchToBoxd
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+3. **Preview** the matched movies and make corrections if needed
 
-Follow these steps:
+4. **Download** the cleaned CSV file
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+5. **Import** it directly into your Letterboxd account  
+   ➤ [Go to Letterboxd Import Page](https://letterboxd.com/import/)
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/3c09d93f-eca1-4052-aa68-27a2b6d1d5ff) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+---
